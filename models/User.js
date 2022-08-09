@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize'); //import Model class and DataTypes from Sequelize
 const sequelize = require('../config/connection');
+const bcrypt = require('bcrypt');
 
 //create our User model
 //User inherits all functionality the Model class has
@@ -41,22 +42,30 @@ User.init(
         }
     },
     {
-        //table configuration options go here (https://sequelize.org/v5/manual/models-definition.html#configuration))
+        hooks: {
+            //before creating the user data, hash the password 10 times and then return the new data.
+           async beforeCreate(newUserData){
+            newUserData.password = await bcrypt.hash(newUserData.password, 10);
+            return newUserData;
+           },
 
-        //pass in our imported sequelize connection (direct connection to our database)
-        sequelize,
+           async beforeUpdate(updatedUserData){
+            updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+            return updatedUserData;
+           }
+        },
 
-        //don't automatically create createdAt/updatedAt timestamp fields
-        timestamps: false,
+        //configuration options go here (https://sequelize.org/v5/manual/models-definition.html#configuration))
 
-        //don't pluralize name of database table
-        freezeTableName: true,
+        sequelize, //pass in our imported sequelize connection (direct connection to our database)
 
-        //use underscores instead of camel-casing (i.e. 'comment_text' and not 'commentText;)
-        underscored: true,
+        timestamps: false, //don't automatically create createdAt/updatedAt timestamp fields
 
-        //make it so our model name stays lowercase in the database
-        modelName: 'user'
+        freezeTableName: true,  //don't pluralize name of database table
+
+        underscored: true,  //use underscores instead of camel-casing (i.e. 'comment_text' and not 'commentText;)
+       
+        modelName: 'user'  //make it so our model name stays lowercase in the database
 
     }
 );

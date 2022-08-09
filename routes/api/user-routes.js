@@ -60,6 +60,7 @@ router.put('/:id', (req, res) => {
     //req.params.id = where we want new data to be used
 
     User.update(req.body, { 
+        individualHooks: true,
         where: {
             id: req.params.id
         }
