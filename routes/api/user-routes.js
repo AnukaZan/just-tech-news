@@ -52,8 +52,9 @@ router.post('/', (req, res) => {
     });
 });
 
+// user sends email and password
 router.post('/login', (req, res) => {
-    User.findOne({
+    User.findOne({ //find one account with this email
         where: {
             email: req.body.email
         }
@@ -63,7 +64,7 @@ router.post('/login', (req, res) => {
             return;
         }
 
-        const validPassword = dbUserData.checkPassword(req.body.password)
+        const validPassword = dbUserData.checkPassword(req.body.password) //return positive if password matches hash
 
         if(!validPassword){
             res.status(400).json({ message: 'Incorrect password '});
